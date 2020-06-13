@@ -5,13 +5,14 @@ import "components/Application.scss";
 import DayList from "./DayList";
 import Appointment from "./Appointment";
 
-import { getAppointmentsForDay } from "helpers/selectors";
+import { getAppointmentsForDay, getInterview } from "helpers/selectors";
 
 export default function Application(props) {
   const [state, setState] = useState({
     day: "Monday",
     days: [],
     appointments: {},
+    interviewers: {},
   });
 
   // const setDays = (days) => setState((prev) => ({ ...prev, days }));
@@ -30,15 +31,29 @@ export default function Application(props) {
           return res.data;
         })
       ),
+      Promise.resolve(
+        axios.get("/api/interviewers").then((res) => {
+          return res.data;
+        })
+      ),
     ]).then((all) => {
-      const [days, appointments] = all;
-      setState((prev) => ({ ...prev, days, appointments }));
+      const [days, appointments, interviewers] = all;
+      setState((prev) => ({ ...prev, days, appointments, interviewers }));
     });
   }, []);
 
-  const appointmentsData = getAppointmentsForDay(state, state.day);
-  const appointments = appointmentsData.map((appt) => {
-    return <Appointment key={appt.id} {...appt} />;
+  const appointments = getAppointmentsForDay(state, state.day);
+  const schedule = appointments.map((appt) => {
+    const interview = getInterview(state, appt.interview);
+
+    return (
+      <Appointment
+        key={appt.id}
+        id={appt.id}
+        time={appt.time}
+        interview={interview}
+      />
+    );
   });
 
   return (
@@ -60,7 +75,7 @@ export default function Application(props) {
         />
       </section>
       <section className="schedule">
-        {appointments}
+        {schedule}
         <Appointment key="last" time="5pm" />
       </section>
     </main>
