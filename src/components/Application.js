@@ -27,25 +27,36 @@ export default function Application(props) {
       interview: { ...interview },
     };
 
-    return axios
-      .put(`/api/appointments/${id}`, appointment)
-      .then((res) => {
-        if (res.status === 204) {
-          return true;
-        }
+    return axios.put(`/api/appointments/${id}`, appointment).then((res) => {
+      if (res.status === 204) {
+        const appointments = {
+          ...state.appointments,
+          [id]: appointment,
+        };
+        setState((prev) => ({ ...prev, appointments }));
+        return true;
+      }
+      return false;
+    });
+  }
+
+  function cancelInterview(id) {
+    return axios.delete(`/api/appointments/${id}`).then((response) => {
+      if (response.status === 204) {
+        const appointment = {
+          ...state.appointments[id],
+          interview: null,
+        };
+        const appointments = {
+          ...state.appointments,
+          [id]: appointment,
+        };
+        setState((prev) => ({ ...prev, appointments }));
+        return true;
+      } else {
         return false;
-      })
-      .then((response) => {
-        if (response) {
-          const appointments = {
-            ...state.appointments,
-            [id]: appointment,
-          };
-          setState((prev) => ({ ...prev, appointments }));
-          return true;
-        }
-        return false;
-      });
+      }
+    });
   }
 
   // Fetch days, only run once
@@ -85,6 +96,7 @@ export default function Application(props) {
         interview={interview}
         interviewers={interviewers}
         bookInterview={bookInterview}
+        cancelInterview={cancelInterview}
       />
     );
   });
