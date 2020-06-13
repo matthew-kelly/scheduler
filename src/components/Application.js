@@ -26,7 +26,6 @@ export default function Application(props) {
       ...state.appointments[id],
       interview: { ...interview },
     };
-
     return axios.put(`/api/appointments/${id}`, appointment).then((res) => {
       if (res.status === 204) {
         const appointments = {
@@ -34,9 +33,7 @@ export default function Application(props) {
           [id]: appointment,
         };
         setState((prev) => ({ ...prev, appointments }));
-        return true;
       }
-      return false;
     });
   }
 
@@ -52,9 +49,6 @@ export default function Application(props) {
           [id]: appointment,
         };
         setState((prev) => ({ ...prev, appointments }));
-        return true;
-      } else {
-        return false;
       }
     });
   }
