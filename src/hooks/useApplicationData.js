@@ -17,9 +17,7 @@ export default function useApplicationData() {
       case SET_APPLICATION_DATA:
         return {
           ...state,
-          days: action.days,
-          appointments: action.appointments,
-          interviewers: action.interviewers,
+          ...action.value,
         };
       case SET_INTERVIEW:
         const appointment = {
@@ -116,9 +114,11 @@ export default function useApplicationData() {
       const [days, appointments, interviewers] = all;
       dispatch({
         type: SET_APPLICATION_DATA,
-        days,
-        appointments,
-        interviewers,
+        value: {
+          days,
+          appointments,
+          interviewers,
+        },
       });
       const socket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
 
