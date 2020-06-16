@@ -23,6 +23,7 @@ export default function useApplicationData() {
           [id]: appointment,
         };
         setState((prev) => ({ ...prev, appointments }));
+        updateSpots(id, appointments);
       }
     });
   }
@@ -39,8 +40,40 @@ export default function useApplicationData() {
           [id]: appointment,
         };
         setState((prev) => ({ ...prev, appointments }));
+        updateSpots(id, appointments);
       }
     });
+  }
+
+  function updateSpots(appointmentID, appointments) {
+    // get day
+    const day = state.days.find((day) =>
+      day.appointments.includes(appointmentID)
+    );
+    // check each appointment for that day and get if empty or not
+    let spots = 0;
+    day.appointments.forEach((ID) => {
+      if (!appointments[ID].interview) {
+        spots++;
+      }
+    });
+    // update day with new spots value
+    const newDay = {
+      ...day,
+      spots,
+    };
+    const days = state.days.map((day) => {
+      if (day.id === newDay.id) {
+        return newDay;
+      } else {
+        return day;
+      }
+    });
+    // update days array in state
+    setState((prev) => ({
+      ...prev,
+      days,
+    }));
   }
 
   // Fetch days, only run once
